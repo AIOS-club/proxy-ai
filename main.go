@@ -11,7 +11,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -161,7 +160,7 @@ func openaiHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write(responseBody)
 
 	// Record request logs
-	log.Printf("[INFO] %s %s (%vms) Request: %s Response: [%v] %s\n", ip, requestID, time.Since(start).Milliseconds(), removeSpacesAndNewlines(requestBodyStr), resp.StatusCode, removeSpacesAndNewlines(string(responseBody)))
+	log.Printf("[INFO] %s %s (%vms) Request: %s Response: [%v] %s\n", ip, requestID, time.Since(start).Milliseconds(), minifyJSONToSingleLine(requestBodyStr), resp.StatusCode, minifyJSONToSingleLine(string(responseBody)))
 }
 
 // Get the IP address
@@ -204,10 +203,17 @@ func errorResponse(w http.ResponseWriter, respMsg string, httpStatus string, htt
 	json.NewEncoder(w).Encode(errResp)
 }
 
-// Clean up line breaks and spaces in the JSON string
-func removeSpacesAndNewlines(s string) string {
-	reg := regexp.MustCompile(`[\s\n]+`)
-	return reg.ReplaceAllString(s, "")
+// Minify a JSON string to a single line.
+func minifyJSONToSingleLine(jsonStr string) string {
+	var jsonObj interface{}
+	if err := json.Unmarshal([]byte(jsonStr), &jsonObj); err != nil {
+		return jsonStr
+	}
+	var buf bytes.Buffer
+	if err := json.Compact(&buf, []byte(jsonStr)); err != nil {
+		return jsonStr
+	}
+	return buf.String()
 }
 
 // Generate a lightweight UUID
