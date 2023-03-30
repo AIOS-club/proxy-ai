@@ -1,12 +1,12 @@
 # Proxy AI Service
 
 ```http request
-POST /openai/v1 HTTP/1.1
+POST /openai HTTP/1.1
 Content-Type: application/json
 
 {
     "api_key": "sk-xcrzWdIciajgkz3VbYGGT3BlbkFJ0hz4a5XSIobZ.....",
-    "path": "/completions",
+    "path": "/v1/completions",
     "method": "POST",
     ...other
 }

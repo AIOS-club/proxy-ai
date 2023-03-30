@@ -34,7 +34,7 @@ type ErrorResponse struct {
 var allowedIPs []string
 
 const (
-	openAIURL = "https://api.openai.com/v1"
+	openAIURL = "https://api.openai.com"
 )
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
 		allowedIPs = append(allowedIPs, strings.TrimSpace(ipStr))
 	}
 
-	http.HandleFunc("/openai/v1", openaiHandler)
+	http.HandleFunc("/openai", openaiHandler)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, fmt.Sprintf("Invalid URL %s", r.URL.Path), "not_found", http.StatusNotFound)
 	})
