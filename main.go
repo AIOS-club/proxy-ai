@@ -125,7 +125,15 @@ func openaiHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Construct the forwarded request
 	openaiURL := openAIURL + openaiReq.Path
-	req, err := http.NewRequest(openaiReq.Method, openaiURL, bytes.NewBuffer(openaiReqBodyBytes))
+
+	var body io.Reader
+	if string(openaiReqBodyBytes) == "" || string(openaiReqBodyBytes) == "{}" {
+		body = http.NoBody
+	} else {
+		body = bytes.NewReader(openaiReqBodyBytes)
+	}
+
+	req, err := http.NewRequest(openaiReq.Method, openaiURL, body)
 	if err != nil {
 		log.Printf("[ERROR] %s %s Failed to create OpenAI request: %v\n", ip, requestID, err)
 		errorResponse(w, "Internal Server Error", "internal_server_error", http.StatusInternalServerError)
